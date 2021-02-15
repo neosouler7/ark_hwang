@@ -47,6 +47,7 @@ class DbManager:
         except Exception as e:
             msg = f'[Error in execute_values query]\n{e}'
             msg += f'\n\nQuery : {query}'
+            print(msg)
 
             cur.close()
             self.conn.rollback()

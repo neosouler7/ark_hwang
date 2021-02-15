@@ -24,7 +24,7 @@ class ArkTracker:
     def get_empty_trade(self, _etf, v):
         trade_date = parse(v.get('trade_date')).strftime('%Y%m%d')
         trade = {
-            'id': f'{_etf}_{v.get("ticker")}_{trade_date}',
+            'ark_id': f'{_etf}_{v.get("ticker")}_{trade_date}',
             'etf': _etf,
             'ticker': v.get('ticker'),
             'trade_date': trade_date,
@@ -44,8 +44,8 @@ class ArkTracker:
 
         df = df[['Ticker', 'Date', 'Direction', 'Shares', 'Fund Weight']]
         df.columns = ['ticker', 'trade_date', 'direction', 'shares', 'fund_weight']
-        df['id'] = pd.factorize(df['ticker'] + df['trade_date'])[0]
-        df.set_index('id')
+        df['ark_id'] = pd.factorize(df['ticker'] + df['trade_date'])[0]
+        df.set_index('ark_id')
 
         parsed_info = []
         for i, (k, v) in enumerate(df.to_dict('index').items()):
@@ -62,18 +62,19 @@ class ArkTracker:
             parsed_today = self.get_parsed_today(etf)
 
             # 어제 insert된 날짜의 데이터를 불러와서
-            parsed_info = {x.get('id'): x for x in self.db_manager.get_parsed_info(self.yesterday)}
+            parsed_info = {x.get('ark_id'): x for x in self.db_manager.get_parsed_info(self.yesterday)}
 
             # 차이 계산하고, 전체 대상에 넣고
             parsed_diff = []
             for t in parsed_today:
-                if not parsed_info.get(t.get('id')):
+                if not parsed_info.get(t.get('ark_id')):
                     parsed_diff.append(t)  # etf별 초기화
                     send_target.append(t)  # 전체 etf 대상
 
             # 차이 insert
             if parsed_diff:
                 if not self.db_manager.insert_bulk_row('ark', parsed_diff):
+                    print('db error!')
                     return
 
         # tg 보낸다.

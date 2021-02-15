@@ -3,6 +3,8 @@ import datetime
 
 from utils.common import read_config
 
+MAX_MSG_LENGTH = 4096
+
 
 class TgManager:
     def __new__(cls):
@@ -21,4 +23,13 @@ class TgManager:
 
         tg_msg += f'\n\n{datetime.datetime.now()}'
         for c in self.chat_ids:
-            self.bot.send_message(c, tg_msg, timeout=30)
+            # self.bot.send_message(c, tg_msg, timeout=30)
+
+            q = len(tg_msg) // MAX_MSG_LENGTH
+            if q == 0:
+                self.bot.send_message(c, tg_msg, timeout=30)
+                return
+
+            for i in range(q):
+                self.bot.send_message(c, tg_msg[MAX_MSG_LENGTH * i:MAX_MSG_LENGTH * (i + 1)], timeout=30)
+            self.bot.send_message(c, tg_msg[MAX_MSG_LENGTH * q:], timeout=30)
