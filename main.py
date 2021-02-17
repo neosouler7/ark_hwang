@@ -61,8 +61,8 @@ class ArkTracker:
             # 오늘 전체 풀 리스트를 파싱해서
             parsed_today = self.get_parsed_today(etf)
 
-            # 어제 insert된 날짜의 데이터를 불러와서
-            parsed_info = {x.get('ark_id'): x for x in self.db_manager.get_parsed_info(self.yesterday)}
+            # 과거 데이터 불러와서
+            parsed_info = {x.get('ark_id'): x for x in self.db_manager.get_parsed_info()}
 
             # 차이 계산하고, 전체 대상에 넣고
             parsed_diff = []

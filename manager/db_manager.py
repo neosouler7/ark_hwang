@@ -86,9 +86,8 @@ class DbManager:
         query = f'INSERT INTO {table} ({", ".join(params[0].keys())}) VALUES ({", ".join(["%s"] * len(params[0]))})'
         return self.__execute_values(query, [tuple(p.values()) for p in params])
 
-    def get_parsed_info(self, parsed_date):
-        query = "SELECT a.* " \
-                "FROM dtnn.ark AS a " \
-                "WHERE a.parsed_date = '{parsed_date}' "
-        query = query.format(parsed_date=parsed_date)
+    def get_parsed_info(self):
+        query = "SELECT distinct a.* " \
+                "FROM dtnn.ark AS a "
+        # query = query.format(parsed_date=parsed_date)
         return self.__execute(query)
